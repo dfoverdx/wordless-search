@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace WordlessSearch
 {
@@ -15,10 +16,12 @@ namespace WordlessSearch
     {
       string[] words = File.ReadAllLines("./resources/dictionary.txt");
       Letters = String.Join("", words);
-      WordsList = new SortedSet<string>(words, StringComparer.InvariantCultureIgnoreCase);
+      WordsList = new SortedSet<string>(
+        words.Where(word => word.Length > 2),
+        StringComparer.InvariantCultureIgnoreCase);
     }
 
-    static char RandomLetter()
+    public static char RandomLetter()
     {
       return Letters[s_random.Next(Letters.Length)];
     }

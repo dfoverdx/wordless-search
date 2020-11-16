@@ -1,7 +1,10 @@
 namespace WordlessSearch {
   public static class Constants {
-    static readonly int GridSize = 16;
-    static readonly double MinVowelRatio = 0.1;
-    static readonly int MinVowels = (int)(MinVowelRatio * GridSize * GridSize);
+    public const int GridSize = 16;
+    private const double MinVowelRatio = 1.0 / 5.0;
+    public const int MinVowels = (int)(MinVowelRatio * GridSize * GridSize);
+    public const int MaxRunLength = 2;
+    public const int MaxRunsPerRowOrColumn = 2;
+    public const int MinVowelsPerRowOrColumn = 3;
   }
 }
