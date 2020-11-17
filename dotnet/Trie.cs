@@ -10,7 +10,7 @@ namespace WordlessSearch
 
         static Trie()
         {
-            root = new TrieNode(String.Empty, Words.WordsList);
+            root = new TrieNode(string.Empty, Words.WordsList);
         }
 
         private static string searchTrie(string word, string prefix, TrieNode node)
@@ -37,7 +37,7 @@ namespace WordlessSearch
 
         public static string findWord(string haystack)
         {
-            return searchTrie(haystack, String.Empty, root);
+            return searchTrie(haystack, string.Empty, root);
         }
 
         public struct TrieNode

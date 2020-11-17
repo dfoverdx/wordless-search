@@ -40,12 +40,12 @@ namespace WordlessSearch
         private char GetChar(Point point) => grid[point.Item2, point.Item1];
 
         private void SetChar(char value, int X, int Y) {
-            _gridT = null;
+            gridDirty = true;
             grid[Y, X] = value;
         }
 
         private void SetChar(char value, Point point) {
-            _gridT = null;
+            gridDirty = true;
             grid[point.Item2, point.Item1] = value;
         }
     }

@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-
-namespace System
+namespace System.Collections.Generic
 {
     public static class ArrayExtensions
     {
@@ -10,7 +8,8 @@ namespace System
         {
             for (int i = 0; i < array.Length - 1; i++)
             {
-                array[i] = array[Random.Next(i, array.Length)];
+                int idx = Random.Next(i, array.Length);
+                (array[i], array[idx]) = (array[idx], array[i]);
             }
 
             return array;

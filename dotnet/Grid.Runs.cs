@@ -70,6 +70,10 @@ namespace WordlessSearch
                 }
 
                 SetStaticWords();
+                if (Verbose)
+                {
+                    Print();
+                }
             } while (madeChangeLocal);
 
             return madeChange;
@@ -98,6 +102,10 @@ namespace WordlessSearch
                 }
 
                 SetStaticWords();
+                if (Verbose)
+                {
+                    Print();
+                }
             } while (madeChangeLocal);
 
             return madeChange;
@@ -126,6 +134,10 @@ namespace WordlessSearch
                 }
 
                 SetStaticWords();
+                if (Verbose)
+                {
+                    Print();
+                }
             } while (madeChangeLocal);
 
             return madeChange;

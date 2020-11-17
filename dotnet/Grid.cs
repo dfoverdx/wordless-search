@@ -11,13 +11,13 @@ namespace WordlessSearch
     {
         private char[,] grid;
 
-        private char[,] _gridT;
+        private bool gridDirty = true;
+        private readonly char[,] _gridT;
         private char[,] gridT
         {
             get {
-                if (_gridT == null)
+                if (gridDirty)
                 {
-                    _gridT = new char[Size, Size];
                     for (int y = 0; y < Size; y++)
                     {
                         for (int x = 0; x < Size; x++)
@@ -25,6 +25,8 @@ namespace WordlessSearch
                             _gridT[x, y] = grid[y, x];
                         }
                     }
+
+                    gridDirty = false;
                 }
 
                 return _gridT;
@@ -45,6 +47,8 @@ namespace WordlessSearch
         {
             Size = size;
             grid = new char[size, size];
+            _gridT = new char[size, size];
+            charBuffer = new char[Size];
 
             for (int y = 0; y < Size; y++)
             {
@@ -70,7 +74,7 @@ namespace WordlessSearch
 
         public void Reset()
         {
-            _gridT = null;
+            gridDirty = true;
             for (int y = 0; y < Size; y++)
             {
                 for (int x = 0; x < Size; x++)
@@ -86,119 +90,6 @@ namespace WordlessSearch
             {
                 SetWord(word);
             }
-        }
-
-        private string Search(Point point, Direction direction, bool includeFinal = false)
-        {
-            StringBuilder str = new StringBuilder(Size);
-            var (x, y) = point;
-            char[] block;
-            int blockLen;
-
-            switch (direction)
-            {
-                case Direction.North:
-                    block = new char[y];
-                    if (block.Length == 0)
-                    {
-                        return null;
-                    }
-
-                    Buffer.BlockCopy(gridT, x * Size * sizeof(char), block, 0, y * sizeof(char));
-                    str.Append(block.Reverse());
-                    break;
-
-                case Direction.South:
-                    block = new char[Size - y];
-                    if (block.Length == 0)
-                    {
-                        return null;
-                    }
-
-                    Buffer.BlockCopy(gridT, (x * Size + y) * sizeof(char), block, 0, (Size - y) * sizeof(char));
-                    str.Append(block);
-                    break;
-
-                case Direction.East:
-                    block = new char[Size - x];
-                    if (block.Length == 0)
-                    {
-                        return null;
-                    }
-
-                    Buffer.BlockCopy(grid, (y * Size + x) * sizeof(char), block, 0, (Size - x) * sizeof(char));
-                    str.Append(block);
-                    break;
-
-                case Direction.West:
-                    block = new char[x];
-                    if (block.Length == 0)
-                    {
-                        return null;
-                    }
-
-                    Buffer.BlockCopy(grid, (y * Size) * sizeof(char), block, 0, x * sizeof(char));
-                    str.Append(block.Reverse());
-                    break;
-
-                case Direction.Northeast:
-                    blockLen = Math.Min(y, Size - x);
-                    if (blockLen == 0)
-                    {
-                        return null;
-                    }
-
-                    for (int i = 0; i < blockLen; i++)
-                    {
-                        str.Append(grid[y - i, x + i]);
-                    }
-
-                    break;
-
-                case Direction.Northwest:
-                    blockLen = Math.Min(y, x);
-                    if (blockLen == 0)
-                    {
-                        return null;
-                    }
-
-                    for (int i = 0; i < blockLen; i++)
-                    {
-                        str.Append(grid[y - i, x - i]);
-                    }
-
-                    break;
-
-                case Direction.Southeast:
-                    blockLen = Math.Min(Size - y, Size - x);
-                    if (blockLen == 0)
-                    {
-                        return null;
-                    }
-
-                    for (int i = 0; i < blockLen; i++)
-                    {
-                        str.Append(grid[y + i, x + i]);
-                    }
-
-                    break;
-
-                case Direction.Southwest:
-                    blockLen = Math.Min(Size - y, x);
-                    if (blockLen == 0)
-                    {
-                        return null;
-                    }
-
-                    for (int i = 0; i < blockLen; i++)
-                    {
-                        str.Append(grid[y + i, x - i]);
-                    }
-
-                    break;
-            }
-
-            return Trie.findWord(str.ToString());
         }
 
         public void DoEvil()

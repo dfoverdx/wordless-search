@@ -54,46 +54,50 @@ namespace WordlessSearch
                 Console.SetCursorPosition(0, 0);
             }
 
-            Point pos = new Point(Console.CursorLeft, Console.CursorTop);
+            var (left, top) = (Console.CursorLeft, Console.CursorTop);
+            HashSet<Point> wordPoints = CalculateWordPoints(words);
 
-            Print(resetPos);
+            foreach (Point point in Points)
+            {
+                var (x, y) = point;
 
-            Point endPos = new Point(Console.CursorLeft, Console.CursorTop + 2);
-
-            PrintWords(words, pos);
-
-            Console.SetCursorPosition(endPos.Item1, endPos.Item2);
-        }
-
-        public void PrintWords(IEnumerable<WordPos> words)
-        {
-            PrintWords(words, new Point(0, 0));
-        }
-
-        public void PrintWords(IEnumerable<WordPos> words, Point pos)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            var (left, top) = pos;
-
-            int count = 0;
-            foreach (WordPos word in words) {
-                count++;
-
-                var (x, y) = word.Point;
-
-                for (int i = 0; i < word.Length; i++)
+                if (wordPoints.Contains(point))
                 {
-                    Console.SetCursorPosition(left + x * 2, top + y);
-                    Console.Write(GetChar(x, y));
-
-                    (x, y) = new Point(x, y).Move(word.Direction);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                 }
+                else
+                {
+                    Console.ResetColor();
+                }
+
+                Console.SetCursorPosition(left + x * 2, top + y);
+                Console.Write(GetChar(point));
             }
 
             Console.ResetColor();
 
             Console.SetCursorPosition(left, top + Size + 1);
-            Console.Write($"Words: {String.Format("{0,3:###}", count)}");
+            Console.WriteLine($"Words: {String.Format("{0,3:###}", words.Count())}");
+        }
+
+        private HashSet<Point> CalculateWordPoints(IEnumerable<WordPos> words)
+        {
+            HashSet<Point> points = new HashSet<Point>();
+            foreach (WordPos word in words)
+            {
+                var (length, direction, (x, y)) = (
+                    word.Length,
+                    word.Direction,
+                    word.Point
+                );
+
+                for (int i = 0; i < word.Length; i++)
+                {
+                    points.Add(new Point(x, y).Move(direction, i));
+                }
+            }
+
+            return points;
         }
     }
 }

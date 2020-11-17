@@ -36,6 +36,11 @@ namespace WordlessSearch
                 SetChar(Vowels[Random.Next(Vowels.Length)], x, y);
 
                 SetStaticWords();
+
+                if (Verbose)
+                {
+                    Print();
+                }
             }
 
             return madeChange;
@@ -59,6 +64,11 @@ namespace WordlessSearch
 
                     SetStaticWords();
                 }
+
+                if (Verbose)
+                {
+                    Print();
+                }
             }
 
             return madeChange;
@@ -81,6 +91,11 @@ namespace WordlessSearch
                     SetChar(Vowels[Random.Next(Vowels.Length)], x, y);
 
                     SetStaticWords();
+                }
+
+                if (Verbose)
+                {
+                    Print();
                 }
             }
 

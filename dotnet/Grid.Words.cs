@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace WordlessSearch
 {
@@ -8,12 +9,14 @@ namespace WordlessSearch
 
     public partial class Grid
     {
+        private readonly char[] charBuffer;
+
         private bool FixWords()
         {
             bool madeChange = false;
 
-            WordPos[] words;
-            while ((words = ShuffledWords).Length > 0)
+            WordPos[] words = ShuffledWords;
+            while (words.Length > 0)
             {
                 madeChange = true;
 
@@ -22,9 +25,13 @@ namespace WordlessSearch
                     Print(words.Concat(StaticWords));
                 }
 
-                foreach (WordPos word in words.Take(words.Length / 2 + words.Length % 2))
+                foreach (WordPos word in words)
                 {
-                    BreakWord(word);
+                    // Don't break words that have already been broken
+                    if (Search(word.Point, word.Direction) != null)
+                    {
+                        BreakWord(word);
+                    }
                 }
 
                 SetStaticWords();
@@ -44,9 +51,126 @@ namespace WordlessSearch
         {
             get => FindWords()
                 .ToArray()
-                .Shuffle()
-                .OrderBy(item => item.Length)
-                .ToArray();
+                .Shuffle();
+                // .OrderBy(item => item.Length)
+                // .ToArray();
+        }
+
+        private string Search(Point point, Direction direction, bool includeFinal = false)
+        {
+            const int CharSize = sizeof(char);
+            var (x, y) = point;
+            int blockLen;
+            string str;
+
+            switch (direction)
+            {
+                case Direction.North:
+                    if (y < Constants.MinWordLength - 1)
+                    {
+                        return null;
+                    }
+
+                    Buffer.BlockCopy(gridT, x * Size * CharSize, charBuffer, 0, Size * CharSize);
+                    str = new string(charBuffer.Take(y + 1).Reverse().ToArray());
+                    break;
+
+                case Direction.South:
+                    if (y > Size - Constants.MinWordLength - 1)
+                    {
+                        return null;
+                    }
+
+                    Buffer.BlockCopy(gridT, x * Size * CharSize, charBuffer, 0, Size * CharSize);
+                    str = new string(charBuffer.Skip(y).ToArray());
+                    break;
+
+                case Direction.East:
+                    if (x > Size - Constants.MinWordLength - 1)
+                    {
+                        return null;
+                    }
+
+                    Buffer.BlockCopy(grid, y * Size * CharSize, charBuffer, 0, Size * CharSize);
+                    str = new string(charBuffer.Skip(x).ToArray());
+                    break;
+
+                case Direction.West:
+                    if (x < Constants.MinWordLength - 1)
+                    {
+                        return null;
+                    }
+
+                    Buffer.BlockCopy(grid, y * Size * CharSize, charBuffer, 0, Size * CharSize);
+                    str = new string(charBuffer.Take(x + 1).Reverse().ToArray());
+                    break;
+
+                case Direction.Northeast:
+                    blockLen = Math.Min(y, Size - x);
+                    if (blockLen < Constants.MinWordLength)
+                    {
+                        return null;
+                    }
+
+                    for (int i = 0; i < blockLen; i++)
+                    {
+                        charBuffer[i] = grid[y - i, x + i];
+                    }
+
+                    str = new string(charBuffer.Take(blockLen).ToArray());
+                    break;
+
+                case Direction.Northwest:
+                    blockLen = Math.Min(y, x);
+                    if (blockLen < Constants.MinWordLength)
+                    {
+                        return null;
+                    }
+
+                    for (int i = 0; i < blockLen; i++)
+                    {
+                        charBuffer[i] = grid[y - i, x - i];
+                    }
+
+                    str = new string(charBuffer.Take(blockLen).ToArray());
+                    break;
+
+                case Direction.Southeast:
+                    blockLen = Math.Min(Size - y, Size - x);
+                    if (blockLen < Constants.MinWordLength)
+                    {
+                        return null;
+                    }
+
+                    for (int i = 0; i < blockLen; i++)
+                    {
+                        charBuffer[i] = grid[y + i, x + i];
+                    }
+
+                    str = new string(charBuffer.Take(blockLen).ToArray());
+                    break;
+
+                case Direction.Southwest:
+                    blockLen = Math.Min(Size - y, x);
+                    if (blockLen < Constants.MinWordLength)
+                    {
+                        return null;
+                    }
+
+                    for (int i = 0; i < blockLen; i++)
+                    {
+                        charBuffer[i] = grid[y + i, x - i];
+                    }
+
+                    str = new string(charBuffer.Take(blockLen).ToArray());
+                    break;
+
+                default:
+                    // Should never get here...?
+                    throw new Exception("Wut?");
+            }
+
+            return Trie.findWord(str);
         }
 
         public IEnumerable<WordPos> FindWords()
