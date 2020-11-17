@@ -8,7 +8,7 @@ namespace WordlessSearch
 
     public partial class Grid
     {
-                public override string ToString()
+        public override string ToString()
         {
             char[][] rows = new char[Size][];
             for (int r = 0; r < Size; r++)
@@ -55,6 +55,13 @@ namespace WordlessSearch
             }
 
             var (left, top) = (Console.CursorLeft, Console.CursorTop);
+
+            if (left + Size * 2 >= Console.WindowWidth || top + Size + 2 >= Console.WindowHeight)
+            {
+                Console.WriteLine(ToString());
+                return;
+            }
+
             HashSet<Point> wordPoints = CalculateWordPoints(words);
 
             foreach (Point point in Points)
@@ -63,7 +70,14 @@ namespace WordlessSearch
 
                 if (wordPoints.Contains(point))
                 {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    if (StaticWords.Any(w => w.Contains(point)))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                    }
                 }
                 else
                 {
@@ -77,7 +91,7 @@ namespace WordlessSearch
             Console.ResetColor();
 
             Console.SetCursorPosition(left, top + Size + 1);
-            Console.WriteLine($"Words: {String.Format("{0,3:###}", words.Count())}");
+            Console.WriteLine($"Words: {string.Format("{0,3:###}", words.Count())}");
         }
 
         private HashSet<Point> CalculateWordPoints(IEnumerable<WordPos> words)

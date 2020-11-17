@@ -47,13 +47,94 @@ namespace WordlessSearch
             return madeChange;
         }
 
+        private bool FixRepeatCharacters()
+        {
+            return FixRepeatColumnCharacters() | FixRepeatRowCharacters();
+        }
+
+        private bool FixRepeatColumnCharacters()
+        {
+            bool madeChange = false;
+            for (int x = 0; x < Size; x++)
+            {
+                Dictionary<char, List<Point>> charPoints = new Dictionary<char, List<Point>>();
+
+                foreach (Point point in GetColumnPoints(x))
+                {
+                    char c = GetChar(point);
+                    if (!charPoints.ContainsKey(c))
+                    {
+                        charPoints.Add(c, new List<Point>());
+                    }
+
+                    charPoints[c].Add(point);
+                }
+
+                foreach (var (c, points) in charPoints.Where(kvp => kvp.Value.Count > Constants.MaxSameCharacterPerRowOrColumn))
+                {
+                    madeChange = true;
+
+                    Point[] ps = points.ToArray().Shuffle();
+                    foreach (Point point in ps.Take(Constants.MaxSameCharacterPerRowOrColumn - ps.Length))
+                    {
+                        char newChar;
+                        do
+                        {
+                            newChar = Words.RandomLetter();
+                        } while (newChar == c);
+
+                        SetChar(c, point);
+                    }
+                }
+            }
+
+            return madeChange;
+        }
+
+        private bool FixRepeatRowCharacters()
+        {
+            bool madeChange = false;
+            for (int y = 0; y < Size; y++)
+            {
+                Dictionary<char, List<Point>> charPoints = new Dictionary<char, List<Point>>();
+
+                foreach (Point point in GetRowPoints(y))
+                {
+                    char c = GetChar(point);
+                    if (!charPoints.ContainsKey(c))
+                    {
+                        charPoints.Add(c, new List<Point>());
+                    }
+
+                    charPoints[c].Add(point);
+                }
+
+                foreach (var (c, points) in charPoints.Where(kvp => kvp.Value.Count > Constants.MaxSameCharacterPerRowOrColumn))
+                {
+                    madeChange = true;
+
+                    Point[] ps = points.ToArray().Shuffle();
+                    foreach (Point point in ps.Take(Constants.MaxSameCharacterPerRowOrColumn - ps.Length))
+                    {
+                        char newChar;
+                        do
+                        {
+                            newChar = Words.RandomLetter();
+                        } while (newChar == c);
+
+                        SetChar(c, point);
+                    }
+                }
+            }
+
+            return madeChange;
+        }
+
         public WordPos[] ShuffledWords
         {
             get => FindWords()
                 .ToArray()
                 .Shuffle();
-                // .OrderBy(item => item.Length)
-                // .ToArray();
         }
 
         private string Search(Point point, Direction direction, bool includeFinal = false)

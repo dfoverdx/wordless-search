@@ -6,8 +6,9 @@ namespace WordlessSearch {
     public const int MinVowels = (int)(MinVowelRatio * GridSize * GridSize);
     public const int MaxRunLength = 3;
     public const int MaxRunsPerRowOrColumn = 3;
-    // public const int MinVowelsPerRowOrColumn = 3;
-    public const int MinVowelsPerRowOrColumn = 2;
+    public const int MinVowelsPerRowOrColumn = 3;
+    public const int MaxSameCharacterPerRowOrColumn = 4;
+    // public const int MinVowelsPerRowOrColumn = 2;
     public const int MinWordLength = 3;
   }
 }

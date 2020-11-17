@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace WordlessSearch
 {
@@ -9,8 +8,9 @@ namespace WordlessSearch
 
     public partial class Grid
     {
-        private static readonly char[] Vowels = new char[] { 'A', 'E', 'I', 'O', 'U', 'Y' };
+        private static readonly char[] Vowels = new char[] { 'A', 'E', 'I', 'O', 'U' };
         private static readonly HashSet<char> VowelSet = new HashSet<char>(Vowels);
+
         private int CountVowels(IEnumerable<Point> points) =>
             points.Sum(point => VowelSet.Contains(grid[point.Item2, point.Item1]) ? 1 : 0);
 

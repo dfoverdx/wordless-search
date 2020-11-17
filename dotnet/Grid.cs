@@ -99,7 +99,17 @@ namespace WordlessSearch
                 Console.Clear();
             }
 
-            while (FixWords() | FixVowels() | FixRuns());
+            TimeSpan interval = new TimeSpan(0, 0, 3);
+            DateTime lastPrint = new DateTime(1, 1, 1);
+
+            while (FixWords() | FixVowels() | FixRuns() | FixRepeatCharacters())
+            {
+                // if (DateTime.Now - lastPrint > interval)
+                // {
+                //     lastPrint = DateTime.Now;
+                //     Print();
+                // }
+            }
         }
     }
 
@@ -153,42 +163,5 @@ namespace WordlessSearch
         Southeast,
         East,
         Northeast
-    }
-
-    public struct WordPos
-    {
-        public string Word;
-        public int Length => Word.Length;
-        public Direction Direction;
-        public Point Point;
-
-        public static bool operator==(WordPos left, WordPos right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator!=(WordPos left, WordPos right)
-        {
-            return !left.Equals(right);
-        }
-
-        public override bool Equals(object other)
-        {
-            if (!(other is WordPos))
-            {
-                return false;
-            }
-
-            WordPos _other = (WordPos)other;
-            return Direction == _other.Direction &&
-                Word == _other.Word &&
-                Point.Item1 == _other.Point.Item1 &&
-                Point.Item2 == _other.Point.Item2;
-        }
-
-        public override int GetHashCode()
-        {
-            return Word.GetHashCode() * Direction.GetHashCode() * Point.GetHashCode();
-        }
     }
 }
