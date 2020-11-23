@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace WordlessSearch
 {
@@ -13,7 +14,11 @@ namespace WordlessSearch
 
         public bool Contains(Point point)
         {
-            var (x, y) = point;
+            return Contains(point.Item1, point.Item2);
+        }
+
+        public bool Contains(int x, int y)
+        {
             var (posX, posY) = Point;
             switch (Direction)
             {
@@ -55,6 +60,18 @@ namespace WordlessSearch
         public override int GetHashCode()
         {
             return Word.GetHashCode() * Direction.GetHashCode() * Point.GetHashCode();
+        }
+
+        public IEnumerable<Point> Points {
+            get
+            {
+                Point point = Point;
+                for (int i = 0; i < Length; i++)
+                {
+                    yield return point;
+                    point = point.Move(Direction);
+                }
+            }
         }
     }
 }

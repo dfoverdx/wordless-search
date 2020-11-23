@@ -27,7 +27,7 @@ namespace WordlessSearch
 
             char nextLetter = word[prefix.Length];
             TrieNode nextNode = node.Nodes.GetValueOrDefault(nextLetter);
-            if (!(nextNode is {}))
+            if (nextNode == null)
             {
                 return null;
             }
@@ -40,7 +40,7 @@ namespace WordlessSearch
             return searchTrie(haystack, string.Empty, root);
         }
 
-        public struct TrieNode
+        public class TrieNode
         {
             public readonly bool Terminal;
             public readonly Dictionary<Char, TrieNode> Nodes;
@@ -49,7 +49,7 @@ namespace WordlessSearch
             {
                 Terminal = words.Contains(prefix);
 
-                var filtered = (
+                Dictionary<char, TrieNode> filtered = (
                     from word in words
                     where word.Length > prefix.Length
                     group word by word[prefix.Length] into groups

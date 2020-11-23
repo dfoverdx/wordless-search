@@ -1,11 +1,11 @@
 {
 	"folders": [
 		{
-			"path": "./js"
-		},
-		{
 			"path": "./dotnet"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"editor.rulers": [ 180 ],
+		"editor.wordWrapColumn": 180,
+	}
 }

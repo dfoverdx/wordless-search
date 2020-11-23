@@ -1,24 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace WordlessSearch
 {
     using Point = Tuple<int, int>;
 
-    public partial class Grid
+    public partial class WordlessSearch
     {
-        public override string ToString()
-        {
-            char[][] rows = new char[Size][];
-            for (int r = 0; r < Size; r++)
-            {
-                rows[r] = new char[Size];
-                Buffer.BlockCopy(grid, r * Size * sizeof(char), rows[r], 0, Size * sizeof(char));
-            }
-
-            return String.Join("\n", rows.Select(row => String.Join(' ', row)));
-        }
+        public override string ToString() => string.Join("\n", grid.Split().Select(row => string.Join(' ', row)));
 
         public void Print()
         {
@@ -68,15 +59,19 @@ namespace WordlessSearch
             {
                 var (x, y) = point;
 
-                if (wordPoints.Contains(point))
+                if (Constants.HighlightVowels && GetChar(point).IsVowel())
                 {
-                    if (StaticWords.Any(w => w.Contains(point)))
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                }
+                else if (wordPoints.Contains(point))
+                {
+                    if (InStaticWord(point))
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
                     }
                     else
                     {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.ForegroundColor = ConsoleColor.Red;
                     }
                 }
                 else
@@ -92,26 +87,38 @@ namespace WordlessSearch
 
             Console.SetCursorPosition(left, top + Size + 1);
             Console.WriteLine($"Words: {string.Format("{0,3:###}", words.Count())}");
-        }
 
-        private HashSet<Point> CalculateWordPoints(IEnumerable<WordPos> words)
-        {
-            HashSet<Point> points = new HashSet<Point>();
-            foreach (WordPos word in words)
+            if (Stage != null)
             {
-                var (length, direction, (x, y)) = (
-                    word.Length,
-                    word.Direction,
-                    word.Point
-                );
-
-                for (int i = 0; i < word.Length; i++)
-                {
-                    points.Add(new Point(x, y).Move(direction, i));
-                }
+                Console.WriteLine($"\nStage: {Stage.PadRight(20)}");
             }
-
-            return points;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void IfPrint(bool resetPos = true) => IfPrint(FindWords().Concat(StaticWords), resetPos);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void IfPrint(IEnumerable<WordPos> words, bool resetPos = true)
+        {
+            if (DoPrint)
+            {
+                Print(words, resetPos);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void VerbosePrint(Verbosity level, bool resetPos = true) => VerbosePrint(level, FindWords().Concat(StaticWords), resetPos);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void VerbosePrint(Verbosity level, IEnumerable<WordPos> words, bool resetPos = true)
+        {
+            if (level.HasFlag(Constants.VerbosityLevel))
+            {
+                IfPrint(words, resetPos);
+            }
+        }
+
+        private HashSet<Point> CalculateWordPoints(IEnumerable<WordPos> words) =>
+            new HashSet<Point>(words.SelectMany(w => w.Points));
     }
 }
